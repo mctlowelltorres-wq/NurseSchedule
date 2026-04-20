@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 Medical 12-Hr Shift Scheduling System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal active">
+            <div class="modal-content">
+                <h2><i class="fas fa-hospital"></i> Medical 12-Hr Shift Scheduler</h2>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label>👨‍💼 Username</label>
+                        <input type="text" id="username" placeholder="admin" required>
+                    </div>
+                    <div class="input-group">
+                        <label>🔑 Password</label>
+                        <input type="password" id="password" placeholder="admin123" required>
+                    </div>
+                    <div class="credentials-hint">
+                        <small>👑 Admin: admin/admin123 | 👩‍⚕️ User: nurse/nurse123</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login <i class="fas fa-sign-in-alt"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1><i class="fas fa-stethoscope"></i> 12-Hr Medical Scheduling</h1>
+                    <span id="cutoffDisplay"></span>
+                    <span id="userRole" class="role-badge"></span>
+                </div>
+                <div class="header-right">
+                    <button id="prevCutoff" class="btn btn-secondary"><i class="fas fa-chevron-left"></i> Prev</button>
+                    <button id="nextCutoff" class="btn btn-secondary">Next <i class="fas fa-chevron-right"></i></button>
+                    <button id="logoutBtn" class="btn btn-danger">Logout <i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <!-- Admin Controls -->
+            <div id="adminControls" class="controls hidden">
+                <div class="control-section">
+                    <h4>📋 Set Nurse Schedule</h4>
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>Select Nurse:</label>
+                            <select id="nurseSelect">
+                                <option value="">Choose Nurse</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>12-Hr Shift:</label>
+                            <select id="shiftType">
+                                <option value="day">☀️ Day (7AM-7PM)</option>
+                                <option value="night">🌙 Night (7PM-7AM)</option>
+                                <option value="off">📅 Day Off</option>
+                            </select>
+                        </div>
+                        <button id="applyShiftBtn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Apply to Cutoff
+                        </button>
+                        <button id="clearNurseBtn" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear Nurse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h3 id="cutoffTitle">Day 1 - Day 15, [Month Year]</h3>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Days 1-15 headers will be generated -->
+                </div>
+            </div>
+
+            <!-- Export Section (Admin Only) -->
+            <div id="exportControls" class="controls hidden">
+                <h4><i class="fas fa-file-excel"></i> 📊 Export Cutoff Schedule</h4>
+                <div class="export-buttons">
+                    <button id="exportExcelBtn" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Excel/CSV
+                    </button>
+                    <button id="exportPDFBtn" class="btn btn-primary">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button id="exportSummaryBtn" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> Summary Report
+                    </button>
+                    <button id="printBtn" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <h4>🎨 12-Hour Shift Legend</h4>
+                <div class="legend-grid">
+                    <div class="legend-item day">
+                        <span class="color-box day"></span>
+                        ☀️ Day Shift (7AM-7PM)
+                    </div>
+                    <div class="legend-item night">
+                        <span class="color-box night"></span>
+                        🌙 Night Shift (7PM-7AM)
+                    </div>
+                    <div class="legend-item off">
+                        <span class="color-box off"></span>
+                        📅 Day Off
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
