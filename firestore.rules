@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - email: string (required, format: email)
+    //   - role: string (required, enum: ['admin', 'nurse'])
+    //   - displayName: string (optional)
+    //
+    // Collection: nurses
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required)
+    //   - department: string (optional)
+    //   - position: string (optional)
+    //
+    // Collection: schedules
+    // Fields:
+    //   - nurseId: string (required)
+    //   - date: string (required, format: YYYY-MM-DD)
+    //   - shift: string (required, enum: ['6AM-6PM', '6PM-6AM', 'OFF'])
+    //   - updatedBy: string (required)
+    //   - updatedAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "mct.lowelltorres@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function canManageSchedules() {
+      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return isAdmin() || role == 'head_nurse';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && 
+                      hasOnlyAllowedFields(['uid', 'email', 'role', 'displayName']) &&
+                      request.resource.data.role in ['admin', 'head_nurse', 'nurse'] &&
+                      isValidEmail(request.resource.data.email);
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    match /nurses/{nurseId} {
+      allow read: if isAuthenticated();
+      allow write: if canManageSchedules();
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if isAuthenticated();
+      allow write: if canManageSchedules();
+    }
+
+    match /or_schedules/{scheduleId} {
+      allow read: if isAuthenticated() && (isAdmin() || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('department', '').upper() == 'OR'));
+      allow create, update, delete: if isAuthenticated() && (isAdmin() || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'head_nurse' && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('department', '').upper() == 'OR'));
+    }
+
+    match /settings/{settingId} {
+      allow read: if true; // Allow public read for background/name
+      allow write: if isAdmin();
+    }
+  }
+}

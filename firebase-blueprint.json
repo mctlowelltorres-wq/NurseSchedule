@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "nurse"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Nurse": {
+      "title": "Nurse",
+      "description": "Nurse information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "department": { "type": "string" },
+        "position": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Schedule": {
+      "title": "Schedule",
+      "description": "Shift assignment for a nurse on a specific date",
+      "type": "object",
+      "properties": {
+        "nurseId": { "type": "string" },
+        "date": { "type": "string", "format": "date", "description": "ISO date string (YYYY-MM-DD)" },
+        "shift": { "type": "string", "enum": ["6AM-6PM", "6PM-6AM", "OFF"] },
+        "updatedBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nurseId", "date", "shift"]
+    },
+    "ORSchedule": {
+      "title": "ORSchedule",
+      "description": "Operating Room operation schedule",
+      "type": "object",
+      "properties": {
+        "patientName": { "type": "string" },
+        "operationType": { "type": "string" },
+        "doctor": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "done"] },
+        "updatedBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["patientName", "operationType", "doctor", "date", "time"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "systemName": { "type": "string" },
+        "backgroundUrl": { "type": "string" },
+        "primaryColor": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/nurses/{nurseId}": {
+      "schema": "Nurse",
+      "description": "Nurse records"
+    },
+    "/schedules/{scheduleId}": {
+      "schema": "Schedule",
+      "description": "Shift assignments"
+    },
+    "/or_schedules/{scheduleId}": {
+      "schema": "ORSchedule",
+      "description": "OR operation schedules"
+    },
+    "/settings/global": {
+      "schema": "AppSettings",
+      "description": "Global settings"
+    }
+  }
+}

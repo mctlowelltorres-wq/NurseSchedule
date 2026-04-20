@@ -1,0 +1,5 @@
+{
+  "name": "NurseShift Pro",
+  "description": "Professional nurse scheduling system with 12-hour shifts, admin controls, and Excel export.",
+  "requestFramePermissions": []
+}
